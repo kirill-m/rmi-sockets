@@ -1,0 +1,7 @@
+/target/
+/.idea/*
+.DS_Store
+workspace.xml
+*.iws
+*.log
+pluginDir/
