@@ -6,7 +6,6 @@ import java.io.ObjectOutputStream;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.Socket;
-import java.util.List;
 
 /**
  * Created by kirill on 08.09.16
@@ -30,34 +29,27 @@ public class ClientInvocationHandler implements InvocationHandler {
 
             ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
             Object result = ois.readObject();
-//            List<Exception> exceptions;
-//            if (ois.available() > 0) {
-//                exceptions =  (List<Exception>) ois.readObject();
-//                throwException(exceptions);
-//                return result;
-//            }
+            ois.close();
+
+            if (result instanceof Exception)
+                throwException((Exception) result);
 
             return result;
         } catch (IOException e) {
-            throw new RuntimeException("Exception happened during working with socket", e);
+            throw new RuntimeException("Exception happened during work with socket", e);
         }
     }
 
-    private void throwException(List<Exception> list) {
-        if (list == null)
-            return;
-
-        for (Exception e : list) {
-            switch (e.getClass().getSimpleName()) {
-                case "NoSuchMethodException":
-                    throw new RuntimeException("Method has not been found", e);
-                case "InvocationTargetException":
-                    throw new RuntimeException("InvocationTargetException ignore", e);
-                case "IllegalAccessException":
-                    throw new RuntimeException("Method does not have access to the definition of method", e);
-                case "ClassNotFoundException":
-                    throw new RuntimeException("Exception while trying to cast class", e);
-            }
+    private void throwException(Exception e) {
+        switch (e.getClass().getSimpleName()) {
+            case "NoSuchMethodException":
+                throw new RuntimeException("Method has not been found", e);
+            case "InvocationTargetException":
+                throw new RuntimeException("InvocationTargetException ignore", e);
+            case "IllegalAccessException":
+                throw new RuntimeException("Method does not have access to the definition of method", e);
+            case "ClassNotFoundException":
+                throw new RuntimeException("Exception while trying to cast class", e);
         }
     }
 }
